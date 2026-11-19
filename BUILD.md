@@ -20,7 +20,7 @@ There is nothing to compile or install.
 python3 -m unittest discover -s tests -v
 ```
 
-On 2026-11-18 this ran 8 tests in about 3 seconds. `tests/mock_server.py` starts a small server on a free localhost port, so the tests make no calls beyond localhost.
+On 2026-11-19 this ran 9 tests in about 3 seconds. `tests/mock_server.py` starts a small server on a free localhost port, so the tests make no calls beyond localhost.
 
 ## Run
 
