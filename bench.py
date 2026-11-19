@@ -6,6 +6,7 @@ two-stream concurrency, and U+FFFD corruption in the streamed text.
 """
 import argparse
 import json
+import math
 import os
 import sys
 import threading
@@ -129,6 +130,17 @@ def benchmark(base, model, label, api_key=None, timeout=900, log=print):
     return results
 
 
+def positive_timeout(text):
+    """Accept only a finite, positive number of seconds; argparse exits 2 otherwise."""
+    try:
+        value = float(text)
+    except ValueError:
+        raise argparse.ArgumentTypeError("%r is not a number" % text)
+    if not math.isfinite(value) or value <= 0:
+        raise argparse.ArgumentTypeError("%r is not a positive number of seconds" % text)
+    return value
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(
         description="Benchmark an OpenAI-compatible streaming chat endpoint: TTFT, prefill and "
@@ -137,7 +149,8 @@ def main(argv=None):
     ap.add_argument("model", help="model name sent in each request")
     ap.add_argument("label", help="free-text label stored in the result file")
     ap.add_argument("out_json", help="path of the JSON result file")
-    ap.add_argument("--timeout", type=float, default=900.0, help="per-request timeout in seconds (default 900)")
+    ap.add_argument("--timeout", type=positive_timeout, default=900.0,
+                    help="per-request timeout in seconds, greater than 0 (default 900)")
     ap.add_argument("--api-key-env", default=None, metavar="NAME",
                     help="name of an environment variable holding a bearer token to send as the "
                          "Authorization header (default: send no Authorization header)")

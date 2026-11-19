@@ -98,6 +98,17 @@ class BenchTests(unittest.TestCase):
         self.assertEqual(p.returncode, 0, p.stderr)
         self.assertTrue(all(r["auth"] is None for r in self.server.requests))
 
+    def test_nonpositive_timeout_is_a_bad_argument(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            for bad in ("0", "-5", "inf", "nan", "soon"):
+                p = subprocess.run(
+                    [sys.executable, os.path.join(ROOT, "bench.py"), "http://127.0.0.1:1", "m", "x",
+                     os.path.join(tmp, "o.json"), "--timeout", bad],
+                    capture_output=True, text=True)
+                self.assertEqual(p.returncode, 2, (bad, p.returncode, p.stderr))
+                self.assertIn("--timeout", p.stderr)
+                self.assertNotIn("Traceback", p.stderr)
+
     def test_help(self):
         p = subprocess.run([sys.executable, os.path.join(ROOT, "bench.py"), "--help"], capture_output=True, text=True)
         self.assertEqual(p.returncode, 0)
