@@ -1,0 +1,20 @@
+digraph "kodros-openai-endpoint-bench architecture" {
+  rankdir=TB; bgcolor="white"; pad=0.3; nodesep=0.45; ranksep=0.7;
+  node [shape=box, style="rounded,filled", fillcolor="#f6f6f8", color="#c9c9d1", fontname="Helvetica,Arial,sans-serif", fontsize=12, fontcolor="#1b1b1f", margin="0.18,0.1", penwidth=1.4];
+  edge [color="#5c5c66", fontname="Helvetica,Arial,sans-serif", fontsize=10, fontcolor="#5c5c66", arrowsize=0.8];
+  cli [label="bench.py\nbase_url, model, label, out_json", color="#c2410c", penwidth=2.2, fillcolor="#fff7ed"];
+  warm [label="Warm-up request\nnot recorded"];
+  cases [label="4 fixed cases\narithmetic, coding, Chinese, long prefill"];
+  conc [label="2 concurrent streams\ncoding case"];
+  ep [label="OpenAI-compatible endpoint\nyou host"];
+  m [label="Timing and token counts\nfrom the stream and usage object"];
+  out [label="out.json\nper-case stats, last 300 characters"];
+  cli -> warm [];
+  warm -> ep [];
+  cli -> cases [];
+  cases -> ep [label="POST /v1/chat/completions, stream on"];
+  cli -> conc [];
+  conc -> ep [label="2 threads"];
+  ep -> m [label="server-sent events"];
+  m -> out [];
+}
